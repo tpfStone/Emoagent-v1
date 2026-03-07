@@ -1,0 +1,35 @@
+from fastapi import APIRouter, Depends, HTTPException
+
+from app.dao.session_dao import SessionDAO
+from app.dependencies import get_rating_dao, get_session_dao
+from app.dao.rating_dao import RatingDAO
+from app.schemas.rating import RatingRequest, RatingResponse
+
+router = APIRouter(prefix="/api/ratings", tags=["ratings"])
+
+
+@router.post("", response_model=RatingResponse)
+async def submit_rating(
+    request: RatingRequest,
+    rating_dao: RatingDAO = Depends(get_rating_dao),
+    session_dao: SessionDAO = Depends(get_session_dao),
+) -> RatingResponse:
+    valid = await session_dao.validate_token(request.session_id, request.token)
+    if not valid:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    try:
+        rating = await rating_dao.create_rating(
+            session_id=request.session_id,
+            rating_type=request.rating_type,
+            score=request.score,
+        )
+        return RatingResponse(
+            id=rating.id,
+            session_id=str(rating.session_id),
+            rating_type=rating.rating_type,
+            score=rating.score,
+            created_at=rating.created_at,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
