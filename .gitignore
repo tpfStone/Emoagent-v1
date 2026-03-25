@@ -5,9 +5,10 @@
 # ---------- 环境变量 ----------
 .env
 .env.local
-.env.development
-.env.testing
-.env.production
+# 环境模板文件应该被提交
+!.env.development
+!.env.testing
+!.env.production
 
 # ---------- Python ----------
 __pycache__/

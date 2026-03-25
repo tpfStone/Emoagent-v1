@@ -1,4 +1,5 @@
 from app.dao.session_dao import SessionDAO
+from app.utils.metrics import sessions_total
 
 
 class AuthService:
@@ -7,6 +8,7 @@ class AuthService:
 
     async def create_anonymous_session(self) -> dict[str, str]:
         session = await self.session_dao.create_session()
+        sessions_total.inc()
         return {
             "token": session.token,
             "session_id": str(session.session_id),

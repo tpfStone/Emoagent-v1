@@ -1,10 +1,13 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.config import Settings
+from app.dependencies import get_health_service
 from app.handlers import auth_handler, chat_handler, rating_handler, report_handler
+from app.services.health_service import HealthService
 from app.utils.logging import setup_logger
 
 settings = Settings()
@@ -42,7 +45,16 @@ app.include_router(chat_handler.router)
 app.include_router(rating_handler.router)
 app.include_router(report_handler.router)
 
+if settings.ENABLE_METRICS:
+    Instrumentator().instrument(app).expose(app, endpoint=settings.METRICS_PATH)
+
 
 @app.get("/health")
-async def health_check():
-    return {"status": "ok", "version": "0.1.0", "llm_provider": settings.LLM_PROVIDER}
+async def health_check(
+    response: Response,
+    health_service: HealthService = Depends(get_health_service),
+):
+    result = await health_service.check_all()
+    if result["status"] != "healthy":
+        response.status_code = 503
+    return result

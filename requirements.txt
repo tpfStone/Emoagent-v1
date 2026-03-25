@@ -47,5 +47,6 @@ mypy>=1.13.0
 # dashscope>=1.14.0
 
 # ---------- 可选：监控 ----------
-# prometheus-fastapi-instrumentator>=7.0.0
+prometheus-fastapi-instrumentator>=7.0.0
+prometheus-client>=0.20.0
 # sentry-sdk[fastapi]>=2.19.0

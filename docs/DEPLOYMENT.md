@@ -38,11 +38,62 @@
 
 ---
 
+## 多环境配置管理
+
+项目提供三个预配置的环境模板，适用于不同的开发和部署场景。
+
+### 环境选择
+
+| 环境 | 配置文件 | 适用场景 | LLM Provider | 日志级别 |
+|------|---------|---------|--------------|---------|
+| 开发环境 | `.env.development` | 本地开发调试 | mock | DEBUG |
+| 测试环境 | `.env.testing` | CI/CD自动化测试 | mock | INFO |
+| 生产环境 | `.env.production` | 正式部署 | deepseek | WARNING |
+
+### 使用方法
+
+```bash
+# 开发环境
+cp .env.development .env
+docker-compose up -d
+
+# 测试环境
+cp .env.testing .env
+pytest tests/
+
+# 生产环境
+cp .env.production .env
+# ⚠️ 务必修改生产配置中的密码和API Key
+docker-compose up -d
+```
+
+### 配置差异说明
+
+**开发环境特点**：
+- Mock LLM（无需API Key，快速开发）
+- 详细日志（DEBUG级别）
+- 启用API文档和监控
+- 数据库名：`emoagent_dev`
+
+**测试环境特点**：
+- Mock LLM（测试稳定性）
+- 禁用BERT推理（加速测试）
+- 独立数据库：`emoagent_test`
+- 短TTL（快速清理）
+
+**生产环境特点**：
+- 真实LLM（DeepSeek等）
+- 最小日志（WARNING级别）
+- 禁用API文档（安全考虑）
+- 启用监控指标
+
+---
+
 ## 后端配置
 
 ### 环境变量配置
 
-创建 `.env` 文件（参考 `.env.example`）：
+创建 `.env` 文件（参考环境模板或 `.env.example`）：
 
 ```env
 # ========== 数据库配置 ==========
@@ -342,9 +393,9 @@ server {
 ### 启动 Docker Compose
 
 ```bash
-# 1. 确保 .env 文件已配置
-cp .env.example .env
-# 编辑 .env 文件
+# 1. 选择环境并配置
+cp .env.development .env  # 或 .env.testing / .env.production
+# 编辑 .env 文件（生产环境务必修改密码和API Key）
 
 # 2. 构建并启动所有服务
 docker-compose up -d --build
@@ -352,15 +403,40 @@ docker-compose up -d --build
 # 3. 查看服务状态
 docker-compose ps
 
-# 4. 查看日志
+# 4. 验证服务健康
+curl http://localhost:8200/health
+
+# 5. 访问监控界面
+# Prometheus: http://localhost:9090
+# Grafana: http://localhost:3000 (admin/admin)
+
+# 6. 查看日志
 docker-compose logs -f backend
 
-# 5. 停止服务
+# 7. 停止服务
 docker-compose down
 
-# 6. 完全清理（包括数据卷）
+# 8. 完全清理（包括数据卷）
 docker-compose down -v
 ```
+
+### Docker健康检查
+
+后端服务配置了健康检查机制：
+
+```yaml
+healthcheck:
+  test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
+```
+
+**功能**：
+- 自动检测服务健康状态
+- 不健康时自动重启容器
+- 确保依赖服务就绪后再启动
 
 ---
 
@@ -557,6 +633,45 @@ export default defineConfig({
 
 ---
 
+## 监控系统
+
+### Prometheus + Grafana 部署
+
+EmoAgent集成了完整的监控体系，通过Docker Compose自动部署。
+
+**监控组件**：
+- **Prometheus**（端口9090）：时序数据库，指标采集
+- **Grafana**（端口3000）：数据可视化，仪表板
+- **Backend /metrics**（端口8200）：暴露应用指标
+
+**监控指标**：
+- 业务指标：会话数、消息数、危机触发次数
+- 性能指标：BERT延迟、API响应时间
+- 情绪分析：情绪分布、活跃会话数
+- 系统健康：数据库、Redis、LLM状态
+
+**快速启动**：
+
+```bash
+# 监控服务已集成在docker-compose.yml中
+docker-compose up -d
+
+# 访问Grafana
+open http://localhost:3000  # 默认登录：admin/admin
+
+# 查看预配置仪表板
+# Dashboard → EmoAgent - System Monitoring
+```
+
+**配置文件**：
+- `monitoring/prometheus.yml` - Prometheus采集配置
+- `monitoring/grafana/provisioning/` - Grafana自动配置
+- `monitoring/grafana/dashboards/emoagent.json` - 预配置仪表板
+
+详细说明见 [监控文档](MONITORING.md)
+
+---
+
 ## 监控和日志
 
 ### 日志配置
@@ -580,16 +695,26 @@ def setup_logger():
     return logger
 ```
 
-### Prometheus 指标（可选）
+### Prometheus 指标
 
-```python
-# app/main.py
-from prometheus_fastapi_instrumentator import Instrumentator
+系统已集成Prometheus指标采集，通过 `/metrics` 端点暴露。
 
-app = FastAPI()
+```bash
+# 查看当前指标
+curl http://localhost:8200/metrics
 
-# 添加 Prometheus 指标
-Instrumentator().instrument(app).expose(app)
+# 验证指标采集
+curl http://localhost:9090/api/v1/query?query=emoagent_sessions_total
+```
+
+**控制指标采集**：
+
+```bash
+# 禁用指标（编辑.env）
+ENABLE_METRICS=false
+
+# 重启服务
+docker-compose restart backend
 ```
 
 ### Sentry 错误追踪（可选）
@@ -722,19 +847,47 @@ psql -U emoagent_user -d emoagent -h localhost
 
 ---
 
+## CI/CD 集成
+
+### GitHub Actions 工作流
+
+项目配置了自动化CI流程，确保代码质量和功能稳定性。
+
+**后端CI**（`.github/workflows/backend-ci.yml`）：
+1. 代码格式检查（black、isort）
+2. 类型检查（mypy）
+3. 启动PostgreSQL和Redis服务
+4. 运行测试套件（pytest）
+5. 生成覆盖率报告
+
+**前端CI**（`.github/workflows/frontend-ci.yml`）：
+1. ESLint代码检查
+2. TypeScript类型检查
+3. 运行单元测试（vitest）
+4. 构建验证
+
+**触发条件**：
+- Push到main/develop分支
+- 提交Pull Request到main分支
+
+**查看CI状态**：
+- 访问仓库的Actions标签页
+- README中的CI徽章实时显示状态
+
+---
+
 ## 待补充内容
 
 - [ ] Kubernetes 部署方案
-- [ ] CI/CD 流程配置（GitHub Actions / GitLab CI）
+- [ ] Docker镜像构建和推送工作流
 - [ ] 负载均衡配置（Nginx / Traefik）
 - [ ] 蓝绿部署策略
 - [ ] 灰度发布方案
-- [ ] 监控告警配置（Grafana + AlertManager）
 - [ ] 日志聚合方案（ELK Stack）
 - [ ] 数据库主从复制
 
 ---
 
-**文档版本**: v0.1.0  
-**最后更新**: 2026-03-04  
+**文档版本**: v0.2.0  
+**最后更新**: 2026-03-13  
 **维护者**: 后端团队（部署主导）+ 模型团队（模型部署）+ 前端团队（前端部署）

@@ -7,6 +7,7 @@ import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from app.config import Settings
+from app.utils.metrics import bert_latency, emotion_distribution
 
 logger = logging.getLogger("emoagent")
 
@@ -60,6 +61,9 @@ class EmotionService:
         predicted_idx = torch.argmax(outputs.logits, dim=-1).item()
         emotion = EMOTION_LABELS[predicted_idx]
         latency_ms = int((time.perf_counter() - start) * 1000)
+        
+        bert_latency.observe((time.perf_counter() - start))
+        emotion_distribution.labels(emotion=emotion).inc()
 
         logger.debug(f"Emotion classified: {emotion} ({latency_ms}ms)")
         return emotion, latency_ms

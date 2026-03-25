@@ -1,0 +1,66 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+docs/
+*.md
+README.md
+CHANGELOG.md
+demand.md
+
+# Tests
+tests/
+frontend/src/**/*.test.ts
+frontend/src/**/*.test.tsx
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Node.js
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Models (exclude large model files, download separately)
+models/
+
+# Backups
+*.backup
+*.bak

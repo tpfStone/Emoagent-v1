@@ -13,6 +13,7 @@ from app.services.metrics_service import MetricsService
 from app.services.mock_llm_service import LLMServiceProtocol
 from app.services.prompt_builder import build_emotion_prompt
 from app.services.response_parser import extract_ai_response
+from app.utils.metrics import messages_total, api_latency
 
 logger = logging.getLogger("emoagent")
 
@@ -41,6 +42,8 @@ class ChatService:
     async def process_message(
         self, session_id: str, user_message: str, token: str
     ) -> ChatResponse:
+        start_time = time.perf_counter()
+        
         # 1. 验证 token
         valid = await self.auth_service.validate_token(session_id, token)
         if not valid:
@@ -51,6 +54,8 @@ class ChatService:
 
         # 从数据库获取下一个 turn_index（避免与 Redis 计数不一致导致唯一约束冲突）
         turn_index = await self.metrics_service.turn_dao.get_next_turn_index(session_id)
+        
+        messages_total.inc()
 
         # 2. 危机检测
         if self.settings.CRISIS_DETECTION_ENABLED:
@@ -127,6 +132,10 @@ class ChatService:
             bert_latency_ms=bert_latency_ms,
             llm_latency_ms=llm_latency_ms,
         )
+
+        # 记录API延迟
+        elapsed = time.perf_counter() - start_time
+        api_latency.labels(endpoint='/chat/message').observe(elapsed)
 
         return ChatResponse(
             assistant_message=assistant_message,

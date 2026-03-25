@@ -62,15 +62,31 @@
 
 #### [部署文档](DEPLOYMENT.md)
 生产环境部署指南：
+- **多环境配置管理**（development/testing/production）
 - 环境要求（Python、Node.js、PostgreSQL、Redis）
 - 后端配置（环境变量、数据库迁移）
 - 前端配置（构建优化）
 - **Docker Compose 部署**（推荐方式）
 - 手动部署流程
 - Nginx 配置、SSL/HTTPS 配置
-- 监控和日志、数据库备份与恢复
+- 监控系统部署、CI/CD集成
+- 数据库备份与恢复
 
 **适合**：DevOps 工程师、运维人员
+
+---
+
+#### [监控与可观测性文档](MONITORING.md)
+Prometheus + Grafana监控体系：
+- 监控架构和技术选型
+- 指标体系（业务、性能、情绪、健康）
+- Grafana仪表板使用
+- 告警配置（可选）
+- 常用PromQL查询
+- LLMOps监控扩展方案（真实LLM上线后）
+- 故障排查和最佳实践
+
+**适合**：后端开发者（2人）、运维人员
 
 ---
 
@@ -141,6 +157,7 @@
 - **了解架构** → [系统架构](ARCHITECTURE.md)
 - **了解 LLM 集成方案** → [LLM 集成开发方案](LLM_STRATEGY.md)
 - **部署系统** → [部署文档](DEPLOYMENT.md)
+- **配置监控** → [监控文档](MONITORING.md)
 - **编写测试** → [测试指南](TESTING.md)
 - **设计数据库** → [数据库文档](DATABASE.md)
 - **开发前端** → [前端指南](FRONTEND.md)
@@ -155,7 +172,8 @@
 | LLM_STRATEGY.md | ✅ 完成 | 2026-03-04 |
 | API.md | ✅ 完成 | 2026-03-02 |
 | FRONTEND.md | ✅ 完成（Ant Design + i18n） | 2026-03-06 |
-| DEPLOYMENT.md | ✅ 完成 | 2026-03-04 |
+| DEPLOYMENT.md | ✅ 完成（多环境+CI/CD） | 2026-03-13 |
+| MONITORING.md | ✅ 完成 | 2026-03-13 |
 | TESTING.md | ✅ 完成 | 2026-03-02 |
 | DATABASE.md | ✅ 完成 | 2026-03-02 |
 | DEVELOPMENT.md | ✅ 完成 | 2026-03-04 |
@@ -176,5 +194,6 @@
 
 ---
 
-**文档版本**: v0.1.0  
-**发布日期**: 2026-03-04
+**文档版本**: v0.2.0  
+**发布日期**: 2026-03-13  
+**更新说明**: 新增监控文档，更新部署文档（多环境配置+CI/CD集成）

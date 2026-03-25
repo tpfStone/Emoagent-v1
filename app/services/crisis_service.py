@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass
 
 from app.dao.crisis_dao import CrisisDAO
+from app.utils.metrics import crisis_triggered
 
 logger = logging.getLogger("emoagent")
 
@@ -30,6 +31,7 @@ class CrisisService:
                         "Crisis keyword matched",
                         extra={"keyword": rule.keyword, "priority": rule.priority},
                     )
+                    crisis_triggered.labels(category=rule.category or "unknown").inc()
                     return CrisisResult(
                         is_crisis=True,
                         response=rule.response_template,

@@ -1,5 +1,8 @@
 # 情绪对话系统（EmoAgent v1）
 
+[![Backend CI](https://github.com/YOUR_USERNAME/emoagent-v1/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/emoagent-v1/actions/workflows/backend-ci.yml)
+[![Frontend CI](https://github.com/YOUR_USERNAME/emoagent-v1/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/emoagent-v1/actions/workflows/frontend-ci.yml)
+
 情绪对话系统是一个集成情绪识别、短期记忆、危机干预和智能对话的心理支持原型产品，旨在为用户提供温暖、专业的情绪支持服务。
 
 ## 核心功能
@@ -70,6 +73,55 @@ npm run dev
 
 访问 http://localhost:5173 查看前端界面，API 文档访问 http://localhost:8000/docs 。
 
+### Docker Compose 快速启动
+
+```bash
+# 启动所有服务（包括监控）
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f backend
+```
+
+访问地址：
+- 前端界面：http://localhost:5173
+- 后端API：http://localhost:8200
+- API文档：http://localhost:8200/docs
+- Prometheus：http://localhost:9090
+- Grafana：http://localhost:3000（默认登录：admin/admin）
+
+### 多环境配置
+
+项目支持三种运行环境，使用不同的配置文件：
+
+```bash
+# 开发环境（使用Mock LLM，详细日志）
+cp .env.development .env
+docker-compose up -d
+
+# 测试环境（CI/CD使用）
+cp .env.testing .env
+pytest tests/
+
+# 生产环境（真实LLM，最小日志）
+cp .env.production .env
+# 修改生产配置中的密码和API Key
+docker-compose up -d
+```
+
+**环境差异**：
+
+| 配置项 | development | testing | production |
+|--------|-------------|---------|------------|
+| LLM_PROVIDER | mock | mock | deepseek |
+| DEBUG | true | false | false |
+| LOG_LEVEL | DEBUG | INFO | WARNING |
+| ENABLE_API_DOCS | true | true | false |
+| ENABLE_METRICS | true | false | true |
+
 ## 项目结构
 
 ```
@@ -97,7 +149,14 @@ emoagent-v1/
 │   ├── DATABASE.md         # 数据库设计
 │   ├── TESTING.md          # 测试指南
 │   ├── DEPLOYMENT.md       # 部署文档
-│   └── DEVELOPMENT.md      # 开发指南
+│   ├── DEVELOPMENT.md      # 开发指南
+│   └── MONITORING.md       # 监控与可观测性
+├── monitoring/            # 监控配置
+│   ├── prometheus.yml     # Prometheus配置
+│   └── grafana/           # Grafana配置和仪表板
+├── .github/workflows/     # CI/CD工作流
+│   ├── backend-ci.yml     # 后端测试流程
+│   └── frontend-ci.yml    # 前端测试流程
 ├── demand.md               # 产品需求文档
 ├── CHANGELOG.md            # 更新日志
 ├── .env.example            # 环境变量模板
@@ -108,6 +167,37 @@ emoagent-v1/
 └── docker-compose.yml      # Docker Compose 编排
 ```
 
+## 监控系统
+
+系统集成了Prometheus + Grafana监控体系，提供实时的业务指标、性能指标和健康状态监控。
+
+**监控能力**：
+- ✅ 业务指标：会话数、消息数、危机触发次数、自评分布
+- ✅ 性能指标：BERT推理延迟、API响应时间
+- ✅ 情绪分析：实时情绪分布、活跃会话数
+- ✅ 系统健康：数据库、Redis、LLM服务状态
+- ⏳ LLMOps指标：Token消耗、成本追踪（待真实LLM上线后补充）
+
+**访问地址**：
+- Prometheus：http://localhost:9090
+- Grafana：http://localhost:3000（admin/admin）
+- 指标端点：http://localhost:8200/metrics
+- 健康检查：http://localhost:8200/health
+
+详见 [监控文档](docs/MONITORING.md)
+
+## CI/CD
+
+项目使用GitHub Actions实现自动化测试和代码质量检查。
+
+**CI流程**：
+- ✅ 后端CI：代码格式检查（black、isort）、类型检查（mypy）、单元测试、覆盖率报告
+- ✅ 前端CI：ESLint检查、TypeScript类型检查、单元测试、构建验证
+
+**触发条件**：
+- Push到main/develop分支
+- 提交Pull Request到main分支
+
 ## 文档导航
 
 - **想了解需求** → [需求文档](demand.md)
@@ -117,6 +207,7 @@ emoagent-v1/
 - **想部署系统** → [部署文档](docs/DEPLOYMENT.md)
 - **想编写测试** → [测试指南](docs/TESTING.md)
 - **想了解 LLM 集成方案** → [LLM 集成开发方案](docs/LLM_STRATEGY.md)
+- **想配置监控** → [监控文档](docs/MONITORING.md)
 - **查看所有文档** → [文档中心](docs/README.md)
 
 ## 许可证

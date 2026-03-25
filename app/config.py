@@ -52,6 +52,10 @@ class Settings(BaseSettings):
     # Feature flags
     ENABLE_API_DOCS: bool = True
 
+    # Monitoring
+    ENABLE_METRICS: bool = True
+    METRICS_PATH: str = "/metrics"
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
     @property

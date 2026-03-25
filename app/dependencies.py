@@ -14,6 +14,7 @@ from app.services.chat_service import ChatService
 from app.services.crisis_service import CrisisService
 from app.services.deepseek_llm_service import DeepSeekLLMService
 from app.services.emotion_service import EmotionService
+from app.services.health_service import HealthService
 from app.services.memory_service import MemoryService
 from app.services.metrics_service import MetricsService
 from app.services.mock_llm_service import LLMServiceProtocol, MockLLMService
@@ -119,5 +120,19 @@ def get_chat_service(
         memory_service=memory_service,
         llm_service=llm_service,
         metrics_service=metrics_service,
+        settings=settings,
+    )
+
+
+def get_health_service(
+    db: AsyncSession = Depends(get_db),
+    memory_service: MemoryService = Depends(get_memory_service),
+    llm_service: LLMServiceProtocol = Depends(get_llm_service),
+    settings: Settings = Depends(get_settings),
+) -> HealthService:
+    return HealthService(
+        db=db,
+        redis_client=memory_service.redis,
+        llm_service=llm_service,
         settings=settings,
     )
