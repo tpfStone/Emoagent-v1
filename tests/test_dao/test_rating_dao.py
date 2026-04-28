@@ -1,8 +1,9 @@
-import pytest
 from datetime import UTC, datetime, timedelta
 
-from app.dao.session_dao import SessionDAO
+import pytest
+
 from app.dao.rating_dao import RatingDAO
+from app.dao.session_dao import SessionDAO
 
 
 @pytest.mark.asyncio

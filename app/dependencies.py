@@ -50,7 +50,9 @@ def get_llm_service(settings: Settings = Depends(get_settings)) -> LLMServicePro
     return _llm_service
 
 
-def get_emotion_service(settings: Settings = Depends(get_settings)) -> EmotionService | None:
+def get_emotion_service(
+    settings: Settings = Depends(get_settings),
+) -> EmotionService | None:
     global _emotion_service
     if not settings.ENABLE_EMOTION_DETECTION:
         return None
@@ -89,7 +91,9 @@ def get_auth_service(session_dao: SessionDAO = Depends(get_session_dao)) -> Auth
     return AuthService(session_dao)
 
 
-def get_crisis_service(crisis_dao: CrisisDAO = Depends(get_crisis_dao)) -> CrisisService:
+def get_crisis_service(
+    crisis_dao: CrisisDAO = Depends(get_crisis_dao),
+) -> CrisisService:
     return CrisisService(crisis_dao)
 
 

@@ -1,5 +1,5 @@
-from pydantic_settings import BaseSettings
 from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -34,7 +34,9 @@ class Settings(BaseSettings):
     PORT: int = 8200
 
     # CORS
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://localhost:5174"
+    CORS_ORIGINS: str = (
+        "http://localhost:3000,http://localhost:5173,http://localhost:5174"
+    )
 
     # Memory
     MEMORY_TTL: int = 86400
@@ -65,4 +67,6 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> list[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        return [
+            origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()
+        ]

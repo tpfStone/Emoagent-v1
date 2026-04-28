@@ -1,3 +1,5 @@
+from typing import cast
+
 from app.dao.session_dao import SessionDAO
 from app.utils.metrics import sessions_total
 
@@ -10,7 +12,7 @@ class AuthService:
         session = await self.session_dao.create_session()
         sessions_total.inc()
         return {
-            "token": session.token,
+            "token": cast(str, session.token),
             "session_id": str(session.session_id),
         }
 

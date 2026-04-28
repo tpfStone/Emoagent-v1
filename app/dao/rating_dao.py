@@ -56,8 +56,7 @@ class RatingDAO:
         self, session_id: str, rating_type: str, start: datetime, end: datetime
     ) -> int:
         result = await self.db.execute(
-            select(func.count())
-            .where(
+            select(func.count()).where(
                 UserRating.session_id == uuid.UUID(session_id),
                 UserRating.rating_type == rating_type,
                 UserRating.created_at >= start,

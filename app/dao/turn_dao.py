@@ -37,7 +37,9 @@ class TurnDAO:
         await self.db.refresh(turn)
         return turn
 
-    async def get_turns_by_session(self, session_id: str, limit: int | None = None) -> list[Turn]:
+    async def get_turns_by_session(
+        self, session_id: str, limit: int | None = None
+    ) -> list[Turn]:
         query = (
             select(Turn)
             .where(Turn.session_id == uuid.UUID(session_id))
@@ -50,8 +52,9 @@ class TurnDAO:
 
     async def get_next_turn_index(self, session_id: str) -> int:
         result = await self.db.execute(
-            select(func.coalesce(func.max(Turn.turn_index), 0))
-            .where(Turn.session_id == uuid.UUID(session_id))
+            select(func.coalesce(func.max(Turn.turn_index), 0)).where(
+                Turn.session_id == uuid.UUID(session_id)
+            )
         )
         return result.scalar_one() + 1
 
@@ -88,8 +91,7 @@ class TurnDAO:
         self, session_id: str, start: datetime, end: datetime
     ) -> int:
         result = await self.db.execute(
-            select(func.count())
-            .where(
+            select(func.count()).where(
                 Turn.session_id == uuid.UUID(session_id),
                 Turn.created_at >= start,
                 Turn.created_at <= end,

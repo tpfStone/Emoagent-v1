@@ -23,14 +23,27 @@ class Session(Base):
     __tablename__ = "sessions"
 
     id = Column(Integer, primary_key=True)
-    session_id = Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4)
+    session_id = Column(
+        UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4
+    )
     token = Column(String(255), nullable=False)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
-    last_active_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    created_at = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
+    last_active_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
 
-    conversations = relationship("Conversation", back_populates="session", cascade="all, delete-orphan")
+    conversations = relationship(
+        "Conversation", back_populates="session", cascade="all, delete-orphan"
+    )
     turns = relationship("Turn", back_populates="session", cascade="all, delete-orphan")
-    ratings = relationship("UserRating", back_populates="session", cascade="all, delete-orphan")
+    ratings = relationship(
+        "UserRating", back_populates="session", cascade="all, delete-orphan"
+    )
 
 
 class Conversation(Base):
@@ -45,8 +58,15 @@ class Conversation(Base):
         nullable=False,
     )
     turn_count = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    created_at = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
 
     session = relationship("Session", back_populates="conversations")
 
@@ -67,7 +87,9 @@ class Turn(Base):
     is_crisis = Column(Boolean, nullable=False, default=False)
     bert_latency_ms = Column(Integer, nullable=True)
     llm_latency_ms = Column(Integer, nullable=True)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
 
     session = relationship("Session", back_populates="turns")
 
@@ -84,8 +106,15 @@ class CrisisRule(Base):
     response_template = Column(Text, nullable=False)
     priority = Column(Integer, nullable=False, default=0)
     enabled = Column(Boolean, nullable=False, default=True)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    created_at = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
 
 
 class UserRating(Base):
@@ -97,9 +126,13 @@ class UserRating(Base):
         ForeignKey("sessions.session_id", ondelete="CASCADE"),
         nullable=False,
     )
-    rating_type = Column(Enum("before", "after", name="rating_type_enum"), nullable=False)
+    rating_type: Column[str] = Column(
+        Enum("before", "after", name="rating_type_enum"), nullable=False
+    )
     score = Column(Integer, nullable=False)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
 
     session = relationship("Session", back_populates="ratings")
 

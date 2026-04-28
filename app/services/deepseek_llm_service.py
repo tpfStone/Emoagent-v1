@@ -9,7 +9,12 @@ logger = logging.getLogger("emoagent")
 class DeepSeekLLMService:
     """DeepSeek API 实现 - 通过 OpenAI 兼容接口调用"""
 
-    def __init__(self, api_key: str, base_url: str = "https://api.deepseek.com", model: str = "deepseek-chat"):
+    def __init__(
+        self,
+        api_key: str,
+        base_url: str = "https://api.deepseek.com",
+        model: str = "deepseek-chat",
+    ):
         self.client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         self.model = model
 

@@ -1,10 +1,13 @@
+from datetime import datetime
+from typing import cast
+
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.dao.rating_dao import RatingDAO
 from app.dao.session_dao import SessionDAO
 from app.dependencies import get_rating_dao, get_session_dao
-from app.dao.rating_dao import RatingDAO
 from app.schemas.rating import RatingRequest, RatingResponse
-from app.utils.metrics import rating_submissions, rating_score_distribution
+from app.utils.metrics import rating_score_distribution, rating_submissions
 
 router = APIRouter(prefix="/api/ratings", tags=["ratings"])
 
@@ -25,16 +28,18 @@ async def submit_rating(
             rating_type=request.rating_type,
             score=request.score,
         )
-        
+
         rating_submissions.labels(type=request.rating_type).inc()
-        rating_score_distribution.labels(type=request.rating_type).observe(request.score)
-        
+        rating_score_distribution.labels(type=request.rating_type).observe(
+            request.score
+        )
+
         return RatingResponse(
-            id=rating.id,
+            id=cast(int, rating.id),
             session_id=str(rating.session_id),
-            rating_type=rating.rating_type,
-            score=rating.score,
-            created_at=rating.created_at,
+            rating_type=cast(str, rating.rating_type),
+            score=cast(int, rating.score),
+            created_at=cast(datetime, rating.created_at),
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

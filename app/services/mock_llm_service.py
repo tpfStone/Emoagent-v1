@@ -43,7 +43,9 @@ class MockLLMService:
             ),
             "surprise": "It sounds like something unexpected happened!",
         }
-        self.default_response = "Thank you for sharing that with me. I'm here to listen. Please go on."
+        self.default_response = (
+            "Thank you for sharing that with me. I'm here to listen. Please go on."
+        )
 
     async def generate_response(
         self,

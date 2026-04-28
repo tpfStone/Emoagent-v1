@@ -1,5 +1,6 @@
-import pytest
 from datetime import UTC, datetime, timedelta
+
+import pytest
 
 from app.dao.session_dao import SessionDAO
 from app.dao.turn_dao import TurnDAO
@@ -36,14 +37,24 @@ async def test_get_turns_by_session(db_session):
 
     dao = TurnDAO(db_session)
     await dao.create_turn(
-        session_id=sid, turn_index=1, user_message="msg1",
-        assistant_message="reply1", emotion_label="joy",
-        is_crisis=False, bert_latency_ms=50, llm_latency_ms=300,
+        session_id=sid,
+        turn_index=1,
+        user_message="msg1",
+        assistant_message="reply1",
+        emotion_label="joy",
+        is_crisis=False,
+        bert_latency_ms=50,
+        llm_latency_ms=300,
     )
     await dao.create_turn(
-        session_id=sid, turn_index=2, user_message="msg2",
-        assistant_message="reply2", emotion_label="sadness",
-        is_crisis=False, bert_latency_ms=60, llm_latency_ms=400,
+        session_id=sid,
+        turn_index=2,
+        user_message="msg2",
+        assistant_message="reply2",
+        emotion_label="sadness",
+        is_crisis=False,
+        bert_latency_ms=60,
+        llm_latency_ms=400,
     )
 
     turns = await dao.get_turns_by_session(sid)
@@ -61,9 +72,14 @@ async def test_get_next_turn_index(db_session):
     assert idx == 1
 
     await dao.create_turn(
-        session_id=sid, turn_index=1, user_message="msg",
-        assistant_message="reply", emotion_label=None,
-        is_crisis=False, bert_latency_ms=None, llm_latency_ms=None,
+        session_id=sid,
+        turn_index=1,
+        user_message="msg",
+        assistant_message="reply",
+        emotion_label=None,
+        is_crisis=False,
+        bert_latency_ms=None,
+        llm_latency_ms=None,
     )
     idx = await dao.get_next_turn_index(sid)
     assert idx == 2
@@ -77,19 +93,34 @@ async def _seed_turns(db_session):
     dao = TurnDAO(db_session)
 
     await dao.create_turn(
-        session_id=sid, turn_index=1, user_message="I'm happy",
-        assistant_message="Great!", emotion_label="joy",
-        is_crisis=False, bert_latency_ms=40, llm_latency_ms=1000,
+        session_id=sid,
+        turn_index=1,
+        user_message="I'm happy",
+        assistant_message="Great!",
+        emotion_label="joy",
+        is_crisis=False,
+        bert_latency_ms=40,
+        llm_latency_ms=1000,
     )
     await dao.create_turn(
-        session_id=sid, turn_index=2, user_message="I'm scared",
-        assistant_message="It's okay", emotion_label="fear",
-        is_crisis=False, bert_latency_ms=50, llm_latency_ms=1200,
+        session_id=sid,
+        turn_index=2,
+        user_message="I'm scared",
+        assistant_message="It's okay",
+        emotion_label="fear",
+        is_crisis=False,
+        bert_latency_ms=50,
+        llm_latency_ms=1200,
     )
     await dao.create_turn(
-        session_id=sid, turn_index=3, user_message="I want to die",
-        assistant_message="Crisis help", emotion_label="sadness",
-        is_crisis=True, bert_latency_ms=60, llm_latency_ms=800,
+        session_id=sid,
+        turn_index=3,
+        user_message="I want to die",
+        assistant_message="Crisis help",
+        emotion_label="sadness",
+        is_crisis=True,
+        bert_latency_ms=60,
+        llm_latency_ms=800,
     )
     return sid, dao
 

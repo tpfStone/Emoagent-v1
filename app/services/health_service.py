@@ -4,6 +4,7 @@ Health check service for monitoring system components
 
 import logging
 import time
+from inspect import isawaitable
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -43,7 +44,9 @@ class HealthService:
     async def check_redis(self) -> dict[str, Any]:
         try:
             start = time.perf_counter()
-            await self.redis_client.ping()
+            ping_result = self.redis_client.ping()
+            if isawaitable(ping_result):
+                await ping_result
             latency_ms = int((time.perf_counter() - start) * 1000)
             return {"status": "up", "latency_ms": latency_ms}
         except Exception as e:
@@ -72,7 +75,11 @@ class HealthService:
                 }
         except Exception as e:
             logger.error(f"LLM health check failed: {e}")
-            return {"status": "down", "provider": self.settings.LLM_PROVIDER, "error": str(e)}
+            return {
+                "status": "down",
+                "provider": self.settings.LLM_PROVIDER,
+                "error": str(e),
+            }
 
     async def check_all(self) -> dict[str, Any]:
         db_check = await self.check_database()

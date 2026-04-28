@@ -1,5 +1,5 @@
-import re
 import logging
+import re
 from dataclasses import dataclass
 
 from app.dao.crisis_dao import CrisisDAO

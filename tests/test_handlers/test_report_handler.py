@@ -1,10 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
 from httpx import ASGITransport, AsyncClient
 
-from app.main import app
 from app.dependencies import get_report_service, get_session_dao
+from app.main import app
 from app.schemas.report import TimeRange, WeeklyReportResponse
 
 

@@ -2,6 +2,7 @@ import asyncio
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -19,8 +20,8 @@ _executor = ThreadPoolExecutor(max_workers=1)
 class EmotionService:
     def __init__(self, settings: Settings):
         self.settings = settings
-        self._model = None
-        self._tokenizer = None
+        self._model: Any | None = None
+        self._tokenizer: Any | None = None
         self._device = settings.BERT_DEVICE
         self._load_failed = False
 
@@ -28,7 +29,9 @@ class EmotionService:
         if self._model is not None:
             return
         if self._load_failed:
-            raise RuntimeError("BERT model previously failed to load; skipping retry this session")
+            raise RuntimeError(
+                "BERT model previously failed to load; skipping retry this session"
+            )
         logger.info(f"Loading BERT model: {self.settings.BERT_MODEL_NAME}")
         try:
             self._tokenizer = AutoTokenizer.from_pretrained(
@@ -48,27 +51,33 @@ class EmotionService:
 
     def _classify_sync(self, text: str) -> tuple[str, int]:
         self._load_model()
+        tokenizer = self._tokenizer
+        model = self._model
+        if tokenizer is None or model is None:
+            raise RuntimeError("BERT model is not loaded")
         start = time.perf_counter()
 
-        inputs = self._tokenizer(
+        inputs = tokenizer(
             text, return_tensors="pt", truncation=True, max_length=512, padding=True
         )
         inputs = {k: v.to(self._device) for k, v in inputs.items()}
 
         with torch.no_grad():
-            outputs = self._model(**inputs)
+            outputs = model(**inputs)
 
-        predicted_idx = torch.argmax(outputs.logits, dim=-1).item()
+        predicted_idx = int(torch.argmax(outputs.logits, dim=-1).item())
         emotion = EMOTION_LABELS[predicted_idx]
         latency_ms = int((time.perf_counter() - start) * 1000)
-        
+
         bert_latency.observe((time.perf_counter() - start))
         emotion_distribution.labels(emotion=emotion).inc()
 
         logger.debug(f"Emotion classified: {emotion} ({latency_ms}ms)")
         return emotion, latency_ms
 
-    async def classify_emotion(self, text: str, timeout: float = 45.0) -> tuple[str, int]:
+    async def classify_emotion(
+        self, text: str, timeout: float = 45.0
+    ) -> tuple[str, int]:
         """
         对文本进行情绪分类（在线程池中执行，不阻塞事件循环）。
         首次加载模型时允许较长超时，后续推理毫秒级完成。

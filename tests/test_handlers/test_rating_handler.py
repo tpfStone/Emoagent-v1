@@ -1,10 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
 from httpx import ASGITransport, AsyncClient
 
-from app.main import app
 from app.dependencies import get_rating_dao, get_session_dao
+from app.main import app
 
 
 @pytest.mark.asyncio
