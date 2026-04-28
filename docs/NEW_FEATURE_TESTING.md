@@ -7,7 +7,7 @@
 ## 测试范围
 
 - 自动化测试：验证 `HealthService`、`/health` 接口、多环境模板是否按预期工作。
-- 后端回归：验证新增测试没有破坏原有后端功能。
+- 后端 CI 等价检查：模拟 GitHub Actions 中后端会执行的格式、import、类型和测试检查。
 - 前端回归：模拟 GitHub Actions 中前端会执行的测试、lint、构建。
 - 运行态验证：真正用 Docker 启动服务，检查 `/health`、`/metrics`、Prometheus、Grafana。
 - 基础 API smoke test：用最短路径确认匿名会话、普通聊天、危机干预还能工作。
@@ -99,18 +99,45 @@ pytest tests/test_config/test_env_templates.py -v
 - `test_health_handler.py`：`/health` 健康时返回 200，不健康时返回 503。
 - `test_env_templates.py`：三份 `.env.*` 模板能解析，关键开关符合预期。
 
-## 4. 跑完整后端回归
+## 4. 跑后端本地 CI 等价检查
 
-目的：确认新增测试和环境隔离没有破坏原有后端功能。
+目的：提前模拟 GitHub Actions 中后端会跑的检查，避免推送后 CI 才发现格式、import、类型或测试问题。
+
+自动修复格式和 import 排序：
 
 ```powershell
-.venv\Scripts\python.exe -m pytest tests/ -v
+.venv\Scripts\python.exe -m black app tests
+.venv\Scripts\python.exe -m isort app tests
+```
+
+本地检查命令：
+
+```powershell
+.venv\Scripts\python.exe -m black --check app tests
+.venv\Scripts\python.exe -m isort --check-only app tests
+.venv\Scripts\python.exe -m mypy app --ignore-missing-imports
+.venv\Scripts\python.exe -m pytest tests/ --cov=app --cov-report=term-missing
 ```
 
 通过标准：
 
-- 所有测试通过。
-- 当前预期结果是 `56 passed`。
+- `black --check` 显示所有文件格式正确。
+- `isort --check-only` 没有 import 排序错误。
+- `mypy` 显示 `Success: no issues found`。
+- 后端测试全部通过，当前预期结果是 `56 passed`，覆盖率 `84%`。
+
+说明：
+
+- `black` 是 Python 代码格式化工具。
+- `isort` 是 Python import 排序工具。
+- `mypy` 是 Python 静态类型检查工具。
+- CI 中任一检查失败，整个 Backend CI 都会失败。
+
+如果只想快速跑测试回归，也可以执行：
+
+```powershell
+.venv\Scripts\python.exe -m pytest tests/ -v
+```
 
 可选：生成覆盖率报告，观察新增模块是否有明显测试缺口。
 
@@ -345,7 +372,8 @@ docker-compose down -v
 ## 最终通过标准
 
 - 新增测试全部通过。
-- 完整后端测试通过，当前预期为 `56 passed`。
+- 后端 `black --check`、`isort --check-only`、`mypy` 通过。
+- 完整后端测试通过，当前预期为 `56 passed`，覆盖率 `84%`。
 - 前端 `npm test`、`npm run lint`、`npm run build` 通过。
 - Docker Compose 能构建并启动，backend 状态为 healthy。
 - `/health` 返回 `healthy`，且 database、redis、llm 检查项可见。
@@ -364,6 +392,9 @@ docker-compose down -v
 后端新增测试：通过
 后端完整回归：56 passed
 覆盖率：84%
+后端 black：通过
+后端 isort：通过
+后端 mypy：通过
 
 前端 npm test：通过，12 passed
 前端 lint：通过
@@ -403,6 +434,12 @@ Grafana：通过
 - ChatPage lint 问题，已修复
 - vite.config.ts Vitest 类型配置问题，已修复
 - NEW_FEATURE_TESTING.md 已补充 PowerShell 导入 seed 数据说明
+- Backend CI 遗漏本地 black/isort/mypy 等价检查，已补充到本文档
+- GitHub Actions runner 缺少 redis-cli 导致等待 Redis 超时，已改为 Python socket 检查端口连通性
+
+远程 GitHub Actions：
+- Frontend CI：通过
+- Backend CI：通过
 ```
 
 ## 注意事项
