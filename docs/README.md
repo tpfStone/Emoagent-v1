@@ -6,6 +6,18 @@
 
 ### 技术文档
 
+#### [快速开始指南](QUICKSTART.md)
+面向首次运行项目的最短路径：
+- Docker Compose 快速启动
+- 本地开发启动
+- 服务健康检查
+- 基础功能验证
+- 常见启动问题排查
+
+**适合**：首次接手项目的开发者、测试人员
+
+---
+
 #### [系统架构文档](ARCHITECTURE.md)
 全栈架构设计详解：
 - 整体架构概览（前后端分离）
@@ -130,6 +142,63 @@ Prometheus + Grafana监控体系：
 
 ---
 
+### 协作、验证与实施文档
+
+#### [Git 工作流与提交规范](GIT_WORKFLOW.md)
+团队协作和提交规范：
+- 分支策略
+- Conventional Commits
+- CHANGELOG 更新规范
+- Pull Request 规范
+- CI/CD 集成
+- 发布和回滚流程
+
+**适合**：所有提交代码或文档的成员
+
+---
+
+#### [新功能测试指引](NEW_FEATURE_TESTING.md)
+本次新增运行能力的验收记录和测试流程：
+- HealthService 和 `/health` 自动化测试
+- 多环境模板验证
+- 前后端本地 CI 等价检查
+- Docker Compose 运行态验证
+- Prometheus/Grafana 验证
+- 本轮测试记录和已修复问题
+
+**适合**：推送 GitHub 前的验收测试、后续回归参考
+
+---
+
+#### [实施总结](IMPLEMENTATION_SUMMARY.md)
+监控、CI/CD、多环境配置和 Docker 优化的正式实施总结：
+- 完成任务清单
+- 文件变更清单
+- 功能验证清单
+- 风险和后续优化
+
+**适合**：了解 v0.2.0 变更背景和验收状态
+
+---
+
+### 调研与规划文档
+
+#### [调研文档目录](research/README.md)
+尚未进入实现阶段的新功能调研和方案对比：
+- [并发控制研究方案](research/并发控制研究方案.md)
+
+**适合**：新功能上线前的技术选型和方案评审
+
+---
+
+#### [规划文档目录](planning/README.md)
+项目后续路线图、优先级和阶段性任务：
+- [下一步决策](planning/下一步决策.md)
+
+**适合**：排期、优先级讨论和后续任务跟踪
+
+---
+
 ### 脚本文件
 
 以下文件位于 `scripts/` 目录：
@@ -153,12 +222,18 @@ Prometheus + Grafana监控体系：
 ## 快速链接
 
 - **开始开发** → [开发指南](DEVELOPMENT.md)
+- **快速启动** → [快速开始指南](QUICKSTART.md)
 - **调用 API** → [API 文档](API.md)
 - **了解架构** → [系统架构](ARCHITECTURE.md)
 - **了解 LLM 集成方案** → [LLM 集成开发方案](LLM_STRATEGY.md)
 - **部署系统** → [部署文档](DEPLOYMENT.md)
 - **配置监控** → [监控文档](MONITORING.md)
 - **编写测试** → [测试指南](TESTING.md)
+- **验收新功能** → [新功能测试指引](NEW_FEATURE_TESTING.md)
+- **查看 Git 规范** → [Git 工作流](GIT_WORKFLOW.md)
+- **查看实施总结** → [实施总结](IMPLEMENTATION_SUMMARY.md)
+- **查看后续规划** → [下一步决策](planning/下一步决策.md)
+- **查看调研方案** → [调研文档](research/README.md)
 - **设计数据库** → [数据库文档](DATABASE.md)
 - **开发前端** → [前端指南](FRONTEND.md)
 
@@ -177,6 +252,12 @@ Prometheus + Grafana监控体系：
 | TESTING.md | ✅ 完成 | 2026-03-02 |
 | DATABASE.md | ✅ 完成 | 2026-03-02 |
 | DEVELOPMENT.md | ✅ 完成 | 2026-03-04 |
+| QUICKSTART.md | ✅ 完成 | 2026-03-13 |
+| GIT_WORKFLOW.md | ✅ 完成 | 2026-03-25 |
+| IMPLEMENTATION_SUMMARY.md | ✅ 完成 | 2026-04-28 |
+| NEW_FEATURE_TESTING.md | ✅ 完成 | 2026-04-28 |
+| research/ | 📌 调研中 | 2026-04-28 |
+| planning/ | 📌 持续更新 | 2026-04-28 |
 
 ---
 
@@ -194,6 +275,6 @@ Prometheus + Grafana监控体系：
 
 ---
 
-**文档版本**: v0.2.0  
-**发布日期**: 2026-03-13  
-**更新说明**: 新增监控文档，更新部署文档（多环境配置+CI/CD集成）
+**文档版本**: v0.2.1  
+**发布日期**: 2026-04-28  
+**更新说明**: 新增调研、规划目录，补充新功能测试指引和文档索引

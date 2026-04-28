@@ -548,16 +548,29 @@ AutoModelForSequenceClassification.from_pretrained('nateraw/bert-base-uncased-em
 
 ---
 
+## 历史报告处理
+
+本文件是监控、CI/CD、多环境配置和 Docker 优化的正式实施总结唯一入口。历史执行报告和重复总结已删除，不再作为当前操作指南。
+
+历史报告中仍有价值的内容已提炼到本文和 [新功能测试指引](NEW_FEATURE_TESTING.md)，包括：
+
+- 生产环境需要替换 GitHub 徽章占位符、密钥和默认 Grafana 密码。
+- BERT 模型未随 Docker 镜像打包，真实情绪识别场景需要确认模型下载或挂载方案。
+- Prometheus、Grafana 和 backend 指标采集的资源占用评估。
+- pre-commit、Docker 镜像发布、告警规则和 LLMOps 指标仍属于后续可选增强。
+
+---
+
 ## 参考文档
 
 - [监控文档](MONITORING.md) - 详细的监控配置和使用指南
 - [部署文档](DEPLOYMENT.md) - 多环境配置和部署方法
 - [快速开始](QUICKSTART.md) - 15分钟启动指南
 - [系统架构](ARCHITECTURE.md) - 整体架构设计
-- [下一步决策](../下一步决策.md) - 项目优先级和任务规划
+- [下一步决策](planning/下一步决策.md) - 项目优先级和任务规划
 
 ---
 
-**文档版本**: v0.1.0  
-**最后更新**: 2026-03-13  
+**文档版本**: v0.2.1  
+**最后更新**: 2026-04-28  
 **维护者**: AI Assistant

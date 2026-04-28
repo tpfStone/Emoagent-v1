@@ -148,9 +148,14 @@ emoagent-v1/
 │   ├── FRONTEND.md         # 前端开发指南
 │   ├── DATABASE.md         # 数据库设计
 │   ├── TESTING.md          # 测试指南
+│   ├── NEW_FEATURE_TESTING.md # 新功能测试指引
 │   ├── DEPLOYMENT.md       # 部署文档
 │   ├── DEVELOPMENT.md      # 开发指南
-│   └── MONITORING.md       # 监控与可观测性
+│   ├── MONITORING.md       # 监控与可观测性
+│   ├── GIT_WORKFLOW.md     # Git 工作流与提交规范
+│   ├── IMPLEMENTATION_SUMMARY.md # 实施总结
+│   ├── research/           # 新功能调研方案
+│   └── planning/           # 路线图和下一步决策
 ├── monitoring/            # 监控配置
 │   ├── prometheus.yml     # Prometheus配置
 │   └── grafana/           # Grafana配置和仪表板
@@ -201,13 +206,19 @@ emoagent-v1/
 ## 文档导航
 
 - **想了解需求** → [需求文档](demand.md)
+- **想快速启动** → [快速开始指南](docs/QUICKSTART.md)
 - **想了解架构** → [系统架构](docs/ARCHITECTURE.md)
 - **想调用 API** → [API 文档](docs/API.md)
 - **想开始开发** → [开发指南](docs/DEVELOPMENT.md)
 - **想部署系统** → [部署文档](docs/DEPLOYMENT.md)
 - **想编写测试** → [测试指南](docs/TESTING.md)
+- **想验收新功能** → [新功能测试指引](docs/NEW_FEATURE_TESTING.md)
 - **想了解 LLM 集成方案** → [LLM 集成开发方案](docs/LLM_STRATEGY.md)
 - **想配置监控** → [监控文档](docs/MONITORING.md)
+- **想查看 Git 规范** → [Git 工作流](docs/GIT_WORKFLOW.md)
+- **想查看实施总结** → [实施总结](docs/IMPLEMENTATION_SUMMARY.md)
+- **想查看后续规划** → [下一步决策](docs/planning/下一步决策.md)
+- **想查看新功能调研** → [调研文档](docs/research/README.md)
 - **查看所有文档** → [文档中心](docs/README.md)
 
 ## 许可证
