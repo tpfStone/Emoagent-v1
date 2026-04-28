@@ -31,7 +31,7 @@ class CrisisService:
                         "Crisis keyword matched",
                         extra={"keyword": rule.keyword, "priority": rule.priority},
                     )
-                    crisis_triggered.labels(category=rule.category or "unknown").inc()
+                    crisis_triggered.labels(category=rule.keyword or "unknown").inc()
                     return CrisisResult(
                         is_crisis=True,
                         response=rule.response_template,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Layout, Typography, Button } from 'antd';
 import { BarChartOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -13,13 +13,8 @@ const { Title } = Typography;
 const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useSessionStore();
-  const [showBeforeRating, setShowBeforeRating] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      setShowBeforeRating(true);
-    }
-  }, [isAuthenticated]);
+  const [beforeRatingDismissed, setBeforeRatingDismissed] = useState(false);
+  const showBeforeRating = isAuthenticated && !beforeRatingDismissed;
 
   return (
     <Layout style={{ height: '100vh' }}>
@@ -51,7 +46,7 @@ const ChatPage: React.FC = () => {
       <RatingModal
         type="before"
         open={showBeforeRating}
-        onClose={() => setShowBeforeRating(false)}
+        onClose={() => setBeforeRatingDismissed(true)}
       />
     </Layout>
   );

@@ -10,6 +10,7 @@ def _make_chat_service(
     mock_llm=None,
     crisis_is_crisis=False,
     emotion_label="joy",
+    enable_emotion_detection=True,
 ):
     mock_session_dao = AsyncMock()
     mock_session_dao.validate_token.return_value = True
@@ -40,6 +41,7 @@ def _make_chat_service(
         DATABASE_URL="sqlite+aiosqlite:///:memory:",
         REDIS_URL="redis://localhost:6379/0",
         LLM_PROVIDER="mock",
+        ENABLE_EMOTION_DETECTION=enable_emotion_detection,
     )
 
     return ChatService(
@@ -66,6 +68,24 @@ async def test_process_message_normal_flow():
     assert response.assistant_message == "I understand how you feel"
     assert response.emotion_label == "fear"
     assert response.is_crisis is False
+
+
+@pytest.mark.asyncio
+async def test_process_message_skips_emotion_when_detection_disabled():
+    service = _make_chat_service(
+        emotion_label="fear",
+        enable_emotion_detection=False,
+    )
+
+    response = await service.process_message(
+        session_id="test-session",
+        user_message="I am feeling anxious",
+        token="test-token",
+    )
+
+    assert response.assistant_message == "I understand how you feel"
+    assert response.emotion_label is None
+    service.emotion_service.classify_emotion.assert_not_called()
 
 
 @pytest.mark.asyncio

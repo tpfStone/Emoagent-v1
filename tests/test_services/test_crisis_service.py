@@ -9,6 +9,8 @@ def _make_rule(keyword: str, response: str, priority: int = 100):
     rule.keyword = keyword
     rule.response_template = response
     rule.priority = priority
+    if hasattr(rule, "category"):
+        del rule.category
     return rule
 
 
@@ -28,6 +30,7 @@ async def test_check_crisis_matches():
 
     assert result.is_crisis is True
     assert "crisis hotline" in result.response
+    assert result.matched_keyword == r"(suicide|kill myself|end my life)"
 
 
 @pytest.mark.asyncio

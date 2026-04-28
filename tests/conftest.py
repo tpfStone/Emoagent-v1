@@ -1,10 +1,19 @@
 import asyncio
+import os
 import uuid
 
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from unittest.mock import AsyncMock
+
+# Keep tests isolated from a developer's local .env file. app.database creates
+# Settings at import time, so these values must be present before importing Base.
+os.environ["DATABASE_URL"] = "postgresql://test_user:test_password@localhost:5432/emoagent_test"
+os.environ["DEBUG"] = "false"
+os.environ["ENV"] = "testing"
+os.environ["LOG_LEVEL"] = "INFO"
+os.environ["LLM_PROVIDER"] = "mock"
 
 from app.database import Base
 
