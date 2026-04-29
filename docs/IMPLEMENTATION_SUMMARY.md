@@ -559,6 +559,8 @@ AutoModelForSequenceClassification.from_pretrained('nateraw/bert-base-uncased-em
 - Prometheus、Grafana 和 backend 指标采集的资源占用评估。
 - pre-commit、Docker 镜像发布、告警规则和 LLMOps 指标仍属于后续可选增强。
 
+真实生产部署验证尚未执行。正式上线前必须按 [部署文档](DEPLOYMENT.md) 中的“生产上线前验证清单”完成 staging 或 production-like 验证。
+
 ---
 
 ## 参考文档
@@ -572,5 +574,5 @@ AutoModelForSequenceClassification.from_pretrained('nateraw/bert-base-uncased-em
 ---
 
 **文档版本**: v0.2.1  
-**最后更新**: 2026-04-28  
+**最后更新**: 2026-04-29  
 **维护者**: AI Assistant
